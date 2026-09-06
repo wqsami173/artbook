@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ArtBook</title>
   <style>
     /* ========== RESET & BASE ========== */
@@ -21,6 +21,14 @@
       align-items: center;
       min-height: 100vh;
       padding: 24px;
+      /* Prevent scrolling while drawing */
+      overscroll-behavior: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .artboard-container {
@@ -69,6 +77,9 @@
       background: #f9fafb;
       padding: 6px 12px;
       border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     /* ========== TOOLBAR ========== */
@@ -112,6 +123,7 @@
       transition: all 0.15s ease;
       font-weight: 600;
       color: #374151;
+      touch-action: manipulation;
     }
 
     .pen-size-btn:hover, .tool-btn:hover {
@@ -164,6 +176,7 @@
       cursor: pointer;
       box-shadow: 0 0 0 1px #d1d5db;
       transition: transform 0.12s ease, box-shadow 0.12s ease;
+      touch-action: manipulation;
     }
 
     .color-swatch:hover {
@@ -191,6 +204,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
+      touch-action: manipulation;
     }
 
     .clear-button:hover {
@@ -209,6 +223,7 @@
     .canvas-wrapper {
       padding: 18px;
       background: #e5e7eb;
+      position: relative;
     }
 
     canvas {
@@ -221,6 +236,11 @@
       cursor: crosshair;
       box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
       touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     .info-note {
@@ -234,88 +254,176 @@
       background: #ffffff;
     }
 
+    /* ========== ROOM CODE ========== */
+    .room-code-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .room-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    #roomCodeInput {
+      width: 180px;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #111827;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    #roomCodeInput::placeholder {
+      color: #9ca3af;
+    }
+
+    #roomCodeInput:focus {
+      border-color: #111827;
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+    }
+
+    /* JOIN BUTTON */
+    .join-room-btn {
+      height: 38px;
+      padding: 0 16px;
+      border: 1px solid #111827;
+      border-radius: 8px;
+      background: #111827;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .join-room-btn:hover {
+      background: #374151;
+      border-color: #374151;
+    }
+
+    .join-room-btn:active {
+      transform: scale(0.97);
+    }
+
     /* ========== RESPONSIVE ========== */
     @media (max-width: 800px) {
-      body { padding: 10px; }
-      .toolbar { gap: 12px; padding: 12px; }
-      .app-header { padding: 0 14px; }
-      .status { display: none; }
-      .canvas-wrapper { padding: 10px; }
-      .color-swatch { width: 25px; height: 25px; }
-      .clear-button, .save-button { margin-left: auto; }
+      body { 
+        padding: 10px;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      
+      .artboard-container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .toolbar { 
+        gap: 12px; 
+        padding: 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .app-header { 
+        padding: 0 14px;
+        flex-shrink: 0;
+      }
+      
+      .status { 
+        display: none; 
+      }
+      
+      .canvas-wrapper { 
+        padding: 10px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+      }
+      
+      canvas {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+      }
+      
+      .color-swatch { 
+        width: 25px; 
+        height: 25px; 
+      }
+      
+      .clear-button, .save-button { 
+        margin-left: auto; 
+      }
+      
+      .info-note {
+        flex-shrink: 0;
+      }
     }
-    /* ========== ROOM CODE ========== */
 
-.room-code-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.room-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-}
-
-#roomCodeInput {
-  width: 180px;
-  height: 38px;
-  padding: 0 12px;
-
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-
-  background: #ffffff;
-  color: #111827;
-
-  font-family: inherit;
-  font-size: 13px;
-  outline: none;
-
-  transition: all 0.15s ease;
-}
-
-#roomCodeInput::placeholder {
-  color: #9ca3af;
-}
-
-#roomCodeInput:focus {
-  border-color: #111827;
-  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
-}
-
-/* JOIN BUTTON */
-
-.join-room-btn {
-  height: 38px;
-  padding: 0 16px;
-
-  border: 1px solid #111827;
-  border-radius: 8px;
-
-  background: #111827;
-  color: #ffffff;
-
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.join-room-btn:hover {
-  background: #374151;
-  border-color: #374151;
-}
-
-.join-room-btn:active {
-  transform: scale(0.97);
-}
+    @media (max-width: 480px) {
+      .toolbar {
+        gap: 8px;
+        padding: 8px;
+      }
+      
+      .tool-group {
+        gap: 4px;
+      }
+      
+      .pen-size-btn, .tool-btn {
+        width: 34px;
+        height: 34px;
+      }
+      
+      .color-swatch {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+      }
+      
+      .clear-button, .save-button {
+        height: 34px;
+        padding: 0 10px;
+        font-size: 12px;
+      }
+      
+      .room-code-box {
+        flex-direction: column;
+        gap: 4px;
+      }
+      
+      #roomCodeInput {
+        width: 120px;
+        height: 32px;
+        font-size: 12px;
+      }
+      
+      .join-room-btn {
+        height: 32px;
+        padding: 0 12px;
+        font-size: 11px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -328,26 +436,23 @@
     </div>
     <div class="status">
         <div class="room-code-box">
-  <span class="room-label">Room Code</span>
-
-  <input
-    type="text"
-    id="roomCodeInput"
-    
-    maxlength="20"
-    autocomplete="off"
-  />
-
-  <button id="createRoomBtn" class="join-room-btn">
-    Create
-  </button>
-
-  <button id="joinRoomBtn" class="join-room-btn">
-    Join
-  </button>
-
-</div>
-        🖊️ Pen · 🧽 Eraser · 💾 Save</div>
+          <span class="room-label">Room Code</span>
+          <input
+            type="text"
+            id="roomCodeInput"
+            maxlength="20"
+            autocomplete="off"
+            placeholder="Enter code..."
+          />
+          <button id="createRoomBtn" class="join-room-btn">
+            Create
+          </button>
+          <button id="joinRoomBtn" class="join-room-btn">
+            Join
+          </button>
+        </div>
+        <span>🖊️ Pen · 🧽 Eraser · 💾 Save</span>
+    </div>
   </div>
 
   <!-- TOOLBAR -->
@@ -417,7 +522,7 @@
   </div>
 
   <div class="info-note">
-    Art is not what I see; it’s what I feel, and what I leave behind on the canvas. 🎨✨
+    Art is not what I see; it's what I feel, and what I leave behind on the canvas. 🎨✨
   </div>
 </div>
 
@@ -429,17 +534,14 @@
 const socket = io();
 
 (function () {
-
     const canvas = document.getElementById('drawingCanvas');
     const ctx = canvas.getContext('2d');
 
     const penButtons = document.querySelectorAll('.pen-size-btn');
     const colorSwatches = document.querySelectorAll('.color-swatch');
-
     const clearBtn = document.getElementById('clearCanvasBtn');
     const saveBtn = document.getElementById('saveArtBtn');
     const eraserToggle = document.getElementById('eraserToggle');
-
     const roomInput = document.getElementById('roomCodeInput');
     const createRoomBtn = document.getElementById('createRoomBtn');
     const joinRoomBtn = document.getElementById('joinRoomBtn');
@@ -447,724 +549,404 @@ const socket = io();
     // =========================
     // DRAWING STATE
     // =========================
-
     let currentPenSize = 2;
     let currentColor = '#111827';
-
     let isDrawing = false;
     let isEraserActive = false;
-
     let lastX = 0;
     let lastY = 0;
-
     let currentRoom = null;
-
+    let lastTapTime = 0; // For double-tap detection
 
     // =========================
     // CANVAS INITIALIZATION
     // =========================
-
     function initializeCanvas() {
-
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     initializeCanvas();
 
-
     // =========================
     // ERASER UI
     // =========================
-
     function updateEraserButtonState() {
-
         if (isEraserActive) {
             eraserToggle.classList.add('active');
         } else {
             eraserToggle.classList.remove('active');
         }
-
     }
 
     updateEraserButtonState();
 
-
     // =========================
     // PEN SIZE
     // =========================
-
     penButtons.forEach(button => {
-
         button.addEventListener('click', () => {
-
             penButtons.forEach(btn => {
                 btn.classList.remove('active');
             });
-
             button.classList.add('active');
-
-            currentPenSize =
-                parseInt(button.dataset.size, 10);
-
+            currentPenSize = parseInt(button.dataset.size, 10);
         });
-
+        
+        // Add touch support for pen size buttons
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            penButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            currentPenSize = parseInt(button.dataset.size, 10);
+        });
     });
-
 
     // =========================
     // COLORS
     // =========================
-
     colorSwatches.forEach(swatch => {
-
         swatch.addEventListener('click', () => {
-
             colorSwatches.forEach(item => {
                 item.classList.remove('active');
             });
-
             swatch.classList.add('active');
-
-            currentColor =
-                swatch.dataset.color;
-
+            currentColor = swatch.dataset.color;
         });
-
+        
+        // Add touch support for color swatches
+        swatch.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            colorSwatches.forEach(item => {
+                item.classList.remove('active');
+            });
+            swatch.classList.add('active');
+            currentColor = swatch.dataset.color;
+        });
     });
-
 
     // =========================
     // ERASER
     // =========================
-
     eraserToggle.addEventListener('click', () => {
-
         isEraserActive = !isEraserActive;
-
         updateEraserButtonState();
-
     });
-
+    
+    // Add touch support for eraser
+    eraserToggle.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        isEraserActive = !isEraserActive;
+        updateEraserButtonState();
+    });
 
     // =========================
     // COORDINATES
     // =========================
-
-    function getCanvasCoordinates(event) {
-
-        const rect =
-            canvas.getBoundingClientRect();
-
-        const scaleX =
-            canvas.width / rect.width;
-
-        const scaleY =
-            canvas.height / rect.height;
-
+    function getCanvasCoordinates(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
         return {
-
-            x: (event.clientX - rect.left) * scaleX,
-
-            y: (event.clientY - rect.top) * scaleY
-
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
         };
-
     }
-
 
     // =========================
     // DRAW LOCALLY
     // =========================
-
     function drawDot(x, y, color, size) {
-
         ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            size / 2,
-            0,
-            Math.PI * 2
-        );
-
+        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
         ctx.fillStyle = color;
-
         ctx.fill();
-
         ctx.closePath();
-
     }
 
-
-    function drawLine(
-        x1,
-        y1,
-        x2,
-        y2,
-        color,
-        size
-    ) {
-
+    function drawLine(x1, y1, x2, y2, color, size) {
         ctx.beginPath();
-
         ctx.moveTo(x1, y1);
-
         ctx.lineTo(x2, y2);
-
         ctx.strokeStyle = color;
-
         ctx.lineWidth = size;
-
         ctx.lineCap = 'round';
-
         ctx.lineJoin = 'round';
-
         ctx.stroke();
-
         ctx.closePath();
-
     }
-
 
     // =========================
     // START DRAWING
     // =========================
-
-    function startDrawing(event) {
-
-        event.preventDefault();
-
+    function startDrawing(clientX, clientY) {
         isDrawing = true;
-
-        const pos =
-            getCanvasCoordinates(event);
-
+        
+        const pos = getCanvasCoordinates(clientX, clientY);
         lastX = pos.x;
         lastY = pos.y;
-
-        const drawColor =
-            isEraserActive
-                ? '#ffffff'
-                : currentColor;
-
-        const drawSize =
-            isEraserActive
-                ? currentPenSize * 1.5
-                : currentPenSize;
-
-
+        
+        const drawColor = isEraserActive ? '#ffffff' : currentColor;
+        const drawSize = isEraserActive ? currentPenSize * 1.5 : currentPenSize;
+        
         // Draw locally
-        drawDot(
-            lastX,
-            lastY,
-            drawColor,
-            drawSize
-        );
-
-
+        drawDot(lastX, lastY, drawColor, drawSize);
+        
         // Send dot to other player
         if (currentRoom) {
-
             socket.emit('draw-dot', {
-
                 x: lastX,
                 y: lastY,
-
                 color: drawColor,
-
                 size: drawSize
-
             });
-
         }
-
     }
-
 
     // =========================
     // DRAW
     // =========================
-
-    function draw(event) {
-
+    function draw(clientX, clientY) {
         if (!isDrawing) return;
-
-        event.preventDefault();
-
-        const pos =
-            getCanvasCoordinates(event);
-
+        
+        const pos = getCanvasCoordinates(clientX, clientY);
         const x = pos.x;
         const y = pos.y;
-
-        const drawColor =
-            isEraserActive
-                ? '#ffffff'
-                : currentColor;
-
-        const drawSize =
-            isEraserActive
-                ? currentPenSize * 1.5
-                : currentPenSize;
-
-
+        
+        const drawColor = isEraserActive ? '#ffffff' : currentColor;
+        const drawSize = isEraserActive ? currentPenSize * 1.5 : currentPenSize;
+        
         // Draw locally
-        drawLine(
-            lastX,
-            lastY,
-            x,
-            y,
-            drawColor,
-            drawSize
-        );
-
-
+        drawLine(lastX, lastY, x, y, drawColor, drawSize);
+        
         // Send to server
         if (currentRoom) {
-
             socket.emit('draw', {
-
                 x1: lastX,
                 y1: lastY,
-
                 x2: x,
                 y2: y,
-
                 color: drawColor,
-
                 size: drawSize
-
             });
-
         }
-
-
+        
         lastX = x;
         lastY = y;
-
     }
-
 
     // =========================
     // STOP DRAWING
     // =========================
-
     function stopDrawing() {
-
         isDrawing = false;
-
     }
 
+    // =========================
+    // MOUSE EVENTS
+    // =========================
+    canvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startDrawing(e.clientX, e.clientY);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        e.preventDefault();
+        draw(e.clientX, e.clientY);
+    });
+
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
 
     // =========================
-    // MOUSE
+    // TOUCH EVENTS (Enhanced for mobile/tablet)
     // =========================
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        startDrawing(touch.clientX, touch.clientY);
+    }, { passive: false });
 
-    canvas.addEventListener(
-        'mousedown',
-        startDrawing
-    );
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        draw(touch.clientX, touch.clientY);
+    }, { passive: false });
 
-    canvas.addEventListener(
-        'mousemove',
-        draw
-    );
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        stopDrawing();
+    }, { passive: false });
 
-    canvas.addEventListener(
-        'mouseup',
-        stopDrawing
-    );
-
-    canvas.addEventListener(
-        'mouseleave',
-        stopDrawing
-    );
-
+    canvas.addEventListener('touchcancel', stopDrawing);
 
     // =========================
-    // TOUCH
+    // PEN/STYLUS SUPPORT
     // =========================
+    canvas.addEventListener('pointerdown', (e) => {
+        // Check if it's a pen/stylus
+        if (e.pointerType === 'pen') {
+            e.preventDefault();
+            startDrawing(e.clientX, e.clientY);
+        }
+    });
 
-    canvas.addEventListener(
-        'touchstart',
-        event => {
+    canvas.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'pen' && isDrawing) {
+            e.preventDefault();
+            draw(e.clientX, e.clientY);
+        }
+    });
 
-            event.preventDefault();
-
-            const touch =
-                event.touches[0];
-
-            startDrawing(touch);
-
-        },
-        { passive: false }
-    );
-
-
-    canvas.addEventListener(
-        'touchmove',
-        event => {
-
-            event.preventDefault();
-
-            const touch =
-                event.touches[0];
-
-            draw(touch);
-
-        },
-        { passive: false }
-    );
-
-
-    canvas.addEventListener(
-        'touchend',
-        stopDrawing
-    );
-
+    canvas.addEventListener('pointerup', (e) => {
+        if (e.pointerType === 'pen') {
+            stopDrawing();
+        }
+    });
 
     // =========================
     // CLEAR CANVAS
     // =========================
+    clearBtn.addEventListener('click', clearCanvas);
+    clearBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        clearCanvas();
+    });
 
-    clearBtn.addEventListener(
-        'click',
-        () => {
-
-            ctx.fillStyle = '#ffffff';
-
-            ctx.fillRect(
-                0,
-                0,
-                canvas.width,
-                canvas.height
-            );
-
-
-            // Tell other player
-            if (currentRoom) {
-
-                socket.emit(
-                    'clear-canvas'
-                );
-
-            }
-
+    function clearCanvas() {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Tell other player
+        if (currentRoom) {
+            socket.emit('clear-canvas');
         }
-    );
-
+    }
 
     // =========================
     // SAVE
     // =========================
+    saveBtn.addEventListener('click', saveCanvas);
+    saveBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        saveCanvas();
+    });
 
-    saveBtn.addEventListener(
-        'click',
-        () => {
-
-            const link =
-                document.createElement('a');
-
-            link.download =
-                'my-drawing-' +
-                Date.now() +
-                '.png';
-
-            link.href =
-                canvas.toDataURL(
-                    'image/png'
-                );
-
-            link.click();
-
-        }
-    );
-
+    function saveCanvas() {
+        const link = document.createElement('a');
+        link.download = 'my-drawing-' + Date.now() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
 
     // =========================
     // CREATE ROOM
     // =========================
+    createRoomBtn.addEventListener('click', createRoom);
+    createRoomBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        createRoom();
+    });
 
-    createRoomBtn.addEventListener(
-        'click',
-        () => {
-
-            socket.emit(
-                'create-room'
-            );
-
-        }
-    );
-
+    function createRoom() {
+        socket.emit('create-room');
+    }
 
     // =========================
     // JOIN ROOM
     // =========================
+    joinRoomBtn.addEventListener('click', joinRoom);
+    joinRoomBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        joinRoom();
+    });
 
-    joinRoomBtn.addEventListener(
-        'click',
-        () => {
-
-            const roomCode =
-                roomInput.value
-                    .trim()
-                    .toUpperCase();
-
-            if (!roomCode) {
-
-                alert(
-                    'Enter a room code first.'
-                );
-
-                return;
-
-            }
-
-            socket.emit(
-                'join-room',
-                roomCode
-            );
-
+    function joinRoom() {
+        const roomCode = roomInput.value.trim().toUpperCase();
+        if (!roomCode) {
+            alert('Enter a room code first.');
+            return;
         }
-    );
-
-
-    // =========================
-    // ROOM CREATED
-    // =========================
-
-    socket.on(
-        'room-created',
-        roomCode => {
-
-            currentRoom = roomCode;
-
-            roomInput.value =
-                roomCode;
-
-            alert(
-                `Room created!\n\nRoom Code: ${roomCode}\n\nSend this code to your friend.`
-            );
-
-        }
-    );
-
+        socket.emit('join-room', roomCode);
+    }
 
     // =========================
-    // ROOM JOINED
+    // ROOM EVENTS
     // =========================
+    socket.on('room-created', roomCode => {
+        currentRoom = roomCode;
+        roomInput.value = roomCode;
+        alert(`Room created!\n\nRoom Code: ${roomCode}\n\nSend this code to your friend.`);
+    });
 
-    socket.on(
-        'room-joined',
-        roomCode => {
+    socket.on('room-joined', roomCode => {
+        currentRoom = roomCode;
+        roomInput.value = roomCode;
+        alert(`Joined room: ${roomCode}`);
+    });
 
-            currentRoom = roomCode;
+    socket.on('player-joined', () => {
+        console.log('Another player joined.');
+    });
 
-            roomInput.value =
-                roomCode;
+    socket.on('player-left', () => {
+        console.log('Other player left.');
+    });
 
-            alert(
-                `Joined room: ${roomCode}`
-            );
+    socket.on('draw-dot', data => {
+        drawDot(data.x, data.y, data.color, data.size);
+    });
 
-        }
-    );
+    socket.on('draw', data => {
+        drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
+    });
 
+    socket.on('clear-canvas', () => {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    });
 
-    // =========================
-    // PLAYER JOINED
-    // =========================
-
-    socket.on(
-        'player-joined',
-        () => {
-
-            console.log(
-                'Another player joined.'
-            );
-
-        }
-    );
-
-
-    // =========================
-    // PLAYER LEFT
-    // =========================
-
-    socket.on(
-        'player-left',
-        () => {
-
-            console.log(
-                'Other player left.'
-            );
-
-        }
-    );
-
+    socket.on('room-error', message => {
+        alert(message);
+    });
 
     // =========================
-    // REMOTE DOT
+    // KEYBOARD SHORTCUTS
     // =========================
-
-    socket.on(
-        'draw-dot',
-        data => {
-
-            drawDot(
-                data.x,
-                data.y,
-                data.color,
-                data.size
-            );
-
-        }
-    );
-
-
-    // =========================
-    // REMOTE LINE
-    // =========================
-
-    socket.on(
-        'draw',
-        data => {
-
-            drawLine(
-
-                data.x1,
-                data.y1,
-
-                data.x2,
-                data.y2,
-
-                data.color,
-
-                data.size
-
-            );
-
-        }
-    );
-
-
-    // =========================
-    // REMOTE CLEAR
-    // =========================
-
-    socket.on(
-        'clear-canvas',
-        () => {
-
-            ctx.fillStyle = '#ffffff';
-
-            ctx.fillRect(
-                0,
-                0,
-                canvas.width,
-                canvas.height
-            );
-
-        }
-    );
-
-
-    // =========================
-    // ROOM ERROR
-    // =========================
-
-    socket.on(
-        'room-error',
-        message => {
-
-            alert(message);
-
-        }
-    );
-
-
-    // =========================
-    // KEYBOARD
-    // =========================
-
-    window.addEventListener(
-        'keydown',
-        event => {
-
-            // Eraser
-            if (
-                event.key === 'e' ||
-                event.key === 'E'
-            ) {
-
-                isEraserActive =
-                    !isEraserActive;
-
-                updateEraserButtonState();
-
-                event.preventDefault();
-
-            }
-
-
-            // Save
-            if (
-                event.key === 's' ||
-                event.key === 'S'
-            ) {
-
-                event.preventDefault();
-
-                const link =
-                    document.createElement('a');
-
-                link.download =
-                    'my-drawing-' +
-                    Date.now() +
-                    '.png';
-
-                link.href =
-                    canvas.toDataURL(
-                        'image/png'
-                    );
-
-                link.click();
-
-            }
-
-        }
-    );
-
-
-    // =========================
-    // CONTEXT MENU
-    // =========================
-
-    canvas.addEventListener(
-        'contextmenu',
-        event => {
+    window.addEventListener('keydown', event => {
+        // Eraser
+        if (event.key === 'e' || event.key === 'E') {
+            isEraserActive = !isEraserActive;
+            updateEraserButtonState();
             event.preventDefault();
         }
-    );
+        
+        // Save
+        if (event.key === 's' || event.key === 'S') {
+            event.preventDefault();
+            saveCanvas();
+        }
+    });
 
+    // =========================
+    // CONTEXT MENU PREVENTION
+    // =========================
+    canvas.addEventListener('contextmenu', event => {
+        event.preventDefault();
+    });
 
-    window.addEventListener(
-        'mouseup',
-        stopDrawing
-    );
+    // Prevent default touch behaviors on the entire app
+    document.addEventListener('touchmove', (e) => {
+        if (e.target === canvas) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 
+    window.addEventListener('mouseup', stopDrawing);
 
-    console.log(
-        'Multiplayer Drawing Artboard ready.'
-    );
-
+    console.log('Multiplayer Drawing Artboard ready with touch support!');
 })();
 </script>
