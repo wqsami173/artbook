@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArtBook</title>
+  <style>
+    /* ========== RESET & BASE ========== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .artboard-container {
+      width: min(1200px, 100%);
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    /* ========== HEADER ========== */
+    .app-header {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .app-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 650;
+      letter-spacing: -0.2px;
+    }
+
+    .app-icon {
+      width: 34px;
+      height: 34px;
+      background: #111827;
+      color: #ffffff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #6b7280;
+      background: #f9fafb;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    /* ========== TOOLBAR ========== */
+    .toolbar {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 20px;
+      background: #fafafa;
+      border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap;
+    }
+
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-right: 4px;
+    }
+
+    /* ========== PEN & ERASER BUTTONS ========== */
+    .pen-size-btn, .tool-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .pen-size-btn:hover, .tool-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .pen-size-btn.active, .tool-btn.active {
+      border-color: #111827;
+      background: #111827;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .pen-dot {
+      display: block;
+      background: #111827;
+      border-radius: 50%;
+      transition: background 0.1s;
+    }
+
+    .pen-size-btn.active .pen-dot {
+      background: #ffffff;
+    }
+
+    .dot-1 { width: 4px; height: 4px; }
+    .dot-2 { width: 8px; height: 8px; }
+    .dot-3 { width: 13px; height: 13px; }
+    .dot-4 { width: 18px; height: 18px; }
+
+    .eraser-icon {
+      font-size: 16px;
+      line-height: 1;
+      transform: rotate(0deg);
+    }
+
+    /* ========== COLOR PALETTE ========== */
+    .color-palette {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 0 1px #d1d5db;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.1);
+    }
+
+    .color-swatch.active {
+      transform: scale(1.12);
+      box-shadow: 0 0 0 2px #111827;
+    }
+
+    /* ========== ACTION BUTTONS ========== */
+    .clear-button, .save-button {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 550;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .clear-button:hover {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+
+    .save-button:hover {
+      background: #ecfdf5;
+      border-color: #6ee7b7;
+      color: #059669;
+    }
+
+    /* ========== CANVAS ========== */
+    .canvas-wrapper {
+      padding: 18px;
+      background: #e5e7eb;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      cursor: crosshair;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+      touch-action: none;
+    }
+
+    .info-note {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 12px;
+      background: #ffffff;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 800px) {
+      body { padding: 10px; }
+      .toolbar { gap: 12px; padding: 12px; }
+      .app-header { padding: 0 14px; }
+      .status { display: none; }
+      .canvas-wrapper { padding: 10px; }
+      .color-swatch { width: 25px; height: 25px; }
+      .clear-button, .save-button { margin-left: auto; }
+    }
+    /* ========== ROOM CODE ========== */
+
+.room-code-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.room-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+#roomCodeInput {
+  width: 180px;
+  height: 38px;
+  padding: 0 12px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #111827;
+
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+
+  transition: all 0.15s ease;
+}
+
+#roomCodeInput::placeholder {
+  color: #9ca3af;
+}
+
+#roomCodeInput:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+/* JOIN BUTTON */
+
+.join-room-btn {
+  height: 38px;
+  padding: 0 16px;
+
+  border: 1px solid #111827;
+  border-radius: 8px;
+
+  background: #111827;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.join-room-btn:hover {
+  background: #374151;
+  border-color: #374151;
+}
+
+.join-room-btn:active {
+  transform: scale(0.97);
+}
+  </style>
+</head>
+<body>
+<div class="artboard-container">
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="app-title">
+      <div class="app-icon">✎</div>
+      Artboard
+    </div>
+    <div class="status">
+        <div class="room-code-box">
+  <span class="room-label">Room Code</span>
+
+  <input
+    type="text"
+    id="roomCodeInput"
+    
+    maxlength="20"
+    autocomplete="off"
+  />
+
+  <button id="createRoomBtn" class="join-room-btn">
+    Create
+  </button>
+
+  <button id="joinRoomBtn" class="join-room-btn">
+    Join
+  </button>
+
+</div>
+        🖊️ Pen · 🧽 Eraser · 💾 Save</div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <!-- PEN SIZES -->
+    <div class="tool-group">
+      <span class="tool-label">Pen</span>
+      <button class="pen-size-btn active" data-size="2" title="Thin"><span class="pen-dot dot-1"></span></button>
+      <button class="pen-size-btn" data-size="5" title="Small"><span class="pen-dot dot-2"></span></button>
+      <button class="pen-size-btn" data-size="10" title="Medium"><span class="pen-dot dot-3"></span></button>
+      <button class="pen-size-btn" data-size="18" title="Large"><span class="pen-dot dot-4"></span></button>
+    </div>
+
+    <!-- ERASER TOGGLE -->
+    <div class="tool-group">
+      <span class="tool-label">Erase</span>
+      <button class="tool-btn" id="eraserToggle" title="Eraser (E)">
+        <span class="eraser-icon">🧽</span>
+      </button>
+    </div>
+
+    <!-- COLORS -->
+    <div class="color-palette" id="colorPalette">
+      <div class="color-swatch active" data-color="#111827" style="background:#111827" title="Black"></div>
+      <div class="color-swatch" data-color="#374151" style="background:#374151" title="Dark Gray"></div>
+      <div class="color-swatch" data-color="#6b7280" style="background:#6b7280" title="Gray"></div>
+      <div class="color-swatch" data-color="#9ca3af" style="background:#9ca3af" title="Light Gray"></div>
+      <div class="color-swatch" data-color="#d1d5db" style="background:#d1d5db" title="Silver"></div>
+      <div class="color-swatch" data-color="#7f1d1d" style="background:#7f1d1d" title="Dark Red"></div>
+      <div class="color-swatch" data-color="#b91c1c" style="background:#b91c1c" title="Red"></div>
+      <div class="color-swatch" data-color="#ef4444" style="background:#ef4444" title="Bright Red"></div>
+      <div class="color-swatch" data-color="#fb7185" style="background:#fb7185" title="Rose"></div>
+      <div class="color-swatch" data-color="#c2410c" style="background:#c2410c" title="Dark Orange"></div>
+      <div class="color-swatch" data-color="#f97316" style="background:#f97316" title="Orange"></div>
+      <div class="color-swatch" data-color="#f59e0b" style="background:#f59e0b" title="Amber"></div>
+      <div class="color-swatch" data-color="#facc15" style="background:#facc15" title="Yellow"></div>
+      <div class="color-swatch" data-color="#fde047" style="background:#fde047" title="Bright Yellow"></div>
+      <div class="color-swatch" data-color="#14532d" style="background:#14532d" title="Dark Green"></div>
+      <div class="color-swatch" data-color="#15803d" style="background:#15803d" title="Green"></div>
+      <div class="color-swatch" data-color="#22c55e" style="background:#22c55e" title="Bright Green"></div>
+      <div class="color-swatch" data-color="#84cc16" style="background:#84cc16" title="Lime"></div>
+      <div class="color-swatch" data-color="#06b6d4" style="background:#06b6d4" title="Cyan"></div>
+      <div class="color-swatch" data-color="#1e3a8a" style="background:#1e3a8a" title="Navy"></div>
+      <div class="color-swatch" data-color="#2563eb" style="background:#2563eb" title="Blue"></div>
+      <div class="color-swatch" data-color="#3b82f6" style="background:#3b82f6" title="Sky Blue"></div>
+      <div class="color-swatch" data-color="#38bdf8" style="background:#38bdf8" title="Light Blue"></div>
+      <div class="color-swatch" data-color="#581c87" style="background:#581c87" title="Dark Purple"></div>
+      <div class="color-swatch" data-color="#7c3aed" style="background:#7c3aed" title="Purple"></div>
+      <div class="color-swatch" data-color="#a855f7" style="background:#a855f7" title="Violet"></div>
+      <div class="color-swatch" data-color="#d946ef" style="background:#d946ef" title="Magenta"></div>
+      <div class="color-swatch" data-color="#be185d" style="background:#be185d" title="Dark Pink"></div>
+      <div class="color-swatch" data-color="#ec4899" style="background:#ec4899" title="Pink"></div>
+      <div class="color-swatch" data-color="#f472b6" style="background:#f472b6" title="Light Pink"></div>
+      <div class="color-swatch" data-color="#78350f" style="background:#78350f" title="Brown"></div>
+      <div class="color-swatch" data-color="#92400e" style="background:#92400e" title="Dark Brown"></div>
+      <div class="color-swatch" data-color="#d97706" style="background:#d97706" title="Golden Brown"></div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <button class="clear-button" id="clearCanvasBtn">🧹 Clear</button>
+    <button class="save-button" id="saveArtBtn">💾 Save</button>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrapper">
+    <canvas id="drawingCanvas" width="1000" height="550"></canvas>
+  </div>
+
+  <div class="info-note">
+    Art is not what I see; it’s what I feel, and what I leave behind on the canvas. 🎨✨
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+</body>
+</html>
+
+<script>
+const socket = io();
+
+(function () {
+
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const penButtons = document.querySelectorAll('.pen-size-btn');
+    const colorSwatches = document.querySelectorAll('.color-swatch');
+
+    const clearBtn = document.getElementById('clearCanvasBtn');
+    const saveBtn = document.getElementById('saveArtBtn');
+    const eraserToggle = document.getElementById('eraserToggle');
+
+    const roomInput = document.getElementById('roomCodeInput');
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    const joinRoomBtn = document.getElementById('joinRoomBtn');
+
+    // =========================
+    // DRAWING STATE
+    // =========================
+
+    let currentPenSize = 2;
+    let currentColor = '#111827';
+
+    let isDrawing = false;
+    let isEraserActive = false;
+
+    let lastX = 0;
+    let lastY = 0;
+
+    let currentRoom = null;
+
+
+    // =========================
+    // CANVAS INITIALIZATION
+    // =========================
+
+    function initializeCanvas() {
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }
+
+    initializeCanvas();
+
+
+    // =========================
+    // ERASER UI
+    // =========================
+
+    function updateEraserButtonState() {
+
+        if (isEraserActive) {
+            eraserToggle.classList.add('active');
+        } else {
+            eraserToggle.classList.remove('active');
+        }
+
+    }
+
+    updateEraserButtonState();
+
+
+    // =========================
+    // PEN SIZE
+    // =========================
+
+    penButtons.forEach(button => {
+
+        button.addEventListener('click', () => {
+
+            penButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            button.classList.add('active');
+
+            currentPenSize =
+                parseInt(button.dataset.size, 10);
+
+        });
+
+    });
+
+
+    // =========================
+    // COLORS
+    // =========================
+
+    colorSwatches.forEach(swatch => {
+
+        swatch.addEventListener('click', () => {
+
+            colorSwatches.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            swatch.classList.add('active');
+
+            currentColor =
+                swatch.dataset.color;
+
+        });
+
+    });
+
+
+    // =========================
+    // ERASER
+    // =========================
+
+    eraserToggle.addEventListener('click', () => {
+
+        isEraserActive = !isEraserActive;
+
+        updateEraserButtonState();
+
+    });
+
+
+    // =========================
+    // COORDINATES
+    // =========================
+
+    function getCanvasCoordinates(event) {
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+        const scaleX =
+            canvas.width / rect.width;
+
+        const scaleY =
+            canvas.height / rect.height;
+
+        return {
+
+            x: (event.clientX - rect.left) * scaleX,
+
+            y: (event.clientY - rect.top) * scaleY
+
+        };
+
+    }
+
+
+    // =========================
+    // DRAW LOCALLY
+    // =========================
+
+    function drawDot(x, y, color, size) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            size / 2,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle = color;
+
+        ctx.fill();
+
+        ctx.closePath();
+
+    }
+
+
+    function drawLine(
+        x1,
+        y1,
+        x2,
+        y2,
+        color,
+        size
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(x1, y1);
+
+        ctx.lineTo(x2, y2);
+
+        ctx.strokeStyle = color;
+
+        ctx.lineWidth = size;
+
+        ctx.lineCap = 'round';
+
+        ctx.lineJoin = 'round';
+
+        ctx.stroke();
+
+        ctx.closePath();
+
+    }
+
+
+    // =========================
+    // START DRAWING
+    // =========================
+
+    function startDrawing(event) {
+
+        event.preventDefault();
+
+        isDrawing = true;
+
+        const pos =
+            getCanvasCoordinates(event);
+
+        lastX = pos.x;
+        lastY = pos.y;
+
+        const drawColor =
+            isEraserActive
+                ? '#ffffff'
+                : currentColor;
+
+        const drawSize =
+            isEraserActive
+                ? currentPenSize * 1.5
+                : currentPenSize;
+
+
+        // Draw locally
+        drawDot(
+            lastX,
+            lastY,
+            drawColor,
+            drawSize
+        );
+
+
+        // Send dot to other player
+        if (currentRoom) {
+
+            socket.emit('draw-dot', {
+
+                x: lastX,
+                y: lastY,
+
+                color: drawColor,
+
+                size: drawSize
+
+            });
+
+        }
+
+    }
+
+
+    // =========================
+    // DRAW
+    // =========================
+
+    function draw(event) {
+
+        if (!isDrawing) return;
+
+        event.preventDefault();
+
+        const pos =
+            getCanvasCoordinates(event);
+
+        const x = pos.x;
+        const y = pos.y;
+
+        const drawColor =
+            isEraserActive
+                ? '#ffffff'
+                : currentColor;
+
+        const drawSize =
+            isEraserActive
+                ? currentPenSize * 1.5
+                : currentPenSize;
+
+
+        // Draw locally
+        drawLine(
+            lastX,
+            lastY,
+            x,
+            y,
+            drawColor,
+            drawSize
+        );
+
+
+        // Send to server
+        if (currentRoom) {
+
+            socket.emit('draw', {
+
+                x1: lastX,
+                y1: lastY,
+
+                x2: x,
+                y2: y,
+
+                color: drawColor,
+
+                size: drawSize
+
+            });
+
+        }
+
+
+        lastX = x;
+        lastY = y;
+
+    }
+
+
+    // =========================
+    // STOP DRAWING
+    // =========================
+
+    function stopDrawing() {
+
+        isDrawing = false;
+
+    }
+
+
+    // =========================
+    // MOUSE
+    // =========================
+
+    canvas.addEventListener(
+        'mousedown',
+        startDrawing
+    );
+
+    canvas.addEventListener(
+        'mousemove',
+        draw
+    );
+
+    canvas.addEventListener(
+        'mouseup',
+        stopDrawing
+    );
+
+    canvas.addEventListener(
+        'mouseleave',
+        stopDrawing
+    );
+
+
+    // =========================
+    // TOUCH
+    // =========================
+
+    canvas.addEventListener(
+        'touchstart',
+        event => {
+
+            event.preventDefault();
+
+            const touch =
+                event.touches[0];
+
+            startDrawing(touch);
+
+        },
+        { passive: false }
+    );
+
+
+    canvas.addEventListener(
+        'touchmove',
+        event => {
+
+            event.preventDefault();
+
+            const touch =
+                event.touches[0];
+
+            draw(touch);
+
+        },
+        { passive: false }
+    );
+
+
+    canvas.addEventListener(
+        'touchend',
+        stopDrawing
+    );
+
+
+    // =========================
+    // CLEAR CANVAS
+    // =========================
+
+    clearBtn.addEventListener(
+        'click',
+        () => {
+
+            ctx.fillStyle = '#ffffff';
+
+            ctx.fillRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            // Tell other player
+            if (currentRoom) {
+
+                socket.emit(
+                    'clear-canvas'
+                );
+
+            }
+
+        }
+    );
+
+
+    // =========================
+    // SAVE
+    // =========================
+
+    saveBtn.addEventListener(
+        'click',
+        () => {
+
+            const link =
+                document.createElement('a');
+
+            link.download =
+                'my-drawing-' +
+                Date.now() +
+                '.png';
+
+            link.href =
+                canvas.toDataURL(
+                    'image/png'
+                );
+
+            link.click();
+
+        }
+    );
+
+
+    // =========================
+    // CREATE ROOM
+    // =========================
+
+    createRoomBtn.addEventListener(
+        'click',
+        () => {
+
+            socket.emit(
+                'create-room'
+            );
+
+        }
+    );
+
+
+    // =========================
+    // JOIN ROOM
+    // =========================
+
+    joinRoomBtn.addEventListener(
+        'click',
+        () => {
+
+            const roomCode =
+                roomInput.value
+                    .trim()
+                    .toUpperCase();
+
+            if (!roomCode) {
+
+                alert(
+                    'Enter a room code first.'
+                );
+
+                return;
+
+            }
+
+            socket.emit(
+                'join-room',
+                roomCode
+            );
+
+        }
+    );
+
+
+    // =========================
+    // ROOM CREATED
+    // =========================
+
+    socket.on(
+        'room-created',
+        roomCode => {
+
+            currentRoom = roomCode;
+
+            roomInput.value =
+                roomCode;
+
+            alert(
+                `Room created!\n\nRoom Code: ${roomCode}\n\nSend this code to your friend.`
+            );
+
+        }
+    );
+
+
+    // =========================
+    // ROOM JOINED
+    // =========================
+
+    socket.on(
+        'room-joined',
+        roomCode => {
+
+            currentRoom = roomCode;
+
+            roomInput.value =
+                roomCode;
+
+            alert(
+                `Joined room: ${roomCode}`
+            );
+
+        }
+    );
+
+
+    // =========================
+    // PLAYER JOINED
+    // =========================
+
+    socket.on(
+        'player-joined',
+        () => {
+
+            console.log(
+                'Another player joined.'
+            );
+
+        }
+    );
+
+
+    // =========================
+    // PLAYER LEFT
+    // =========================
+
+    socket.on(
+        'player-left',
+        () => {
+
+            console.log(
+                'Other player left.'
+            );
+
+        }
+    );
+
+
+    // =========================
+    // REMOTE DOT
+    // =========================
+
+    socket.on(
+        'draw-dot',
+        data => {
+
+            drawDot(
+                data.x,
+                data.y,
+                data.color,
+                data.size
+            );
+
+        }
+    );
+
+
+    // =========================
+    // REMOTE LINE
+    // =========================
+
+    socket.on(
+        'draw',
+        data => {
+
+            drawLine(
+
+                data.x1,
+                data.y1,
+
+                data.x2,
+                data.y2,
+
+                data.color,
+
+                data.size
+
+            );
+
+        }
+    );
+
+
+    // =========================
+    // REMOTE CLEAR
+    // =========================
+
+    socket.on(
+        'clear-canvas',
+        () => {
+
+            ctx.fillStyle = '#ffffff';
+
+            ctx.fillRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+        }
+    );
+
+
+    // =========================
+    // ROOM ERROR
+    // =========================
+
+    socket.on(
+        'room-error',
+        message => {
+
+            alert(message);
+
+        }
+    );
+
+
+    // =========================
+    // KEYBOARD
+    // =========================
+
+    window.addEventListener(
+        'keydown',
+        event => {
+
+            // Eraser
+            if (
+                event.key === 'e' ||
+                event.key === 'E'
+            ) {
+
+                isEraserActive =
+                    !isEraserActive;
+
+                updateEraserButtonState();
+
+                event.preventDefault();
+
+            }
+
+
+            // Save
+            if (
+                event.key === 's' ||
+                event.key === 'S'
+            ) {
+
+                event.preventDefault();
+
+                const link =
+                    document.createElement('a');
+
+                link.download =
+                    'my-drawing-' +
+                    Date.now() +
+                    '.png';
+
+                link.href =
+                    canvas.toDataURL(
+                        'image/png'
+                    );
+
+                link.click();
+
+            }
+
+        }
+    );
+
+
+    // =========================
+    // CONTEXT MENU
+    // =========================
+
+    canvas.addEventListener(
+        'contextmenu',
+        event => {
+            event.preventDefault();
+        }
+    );
+
+
+    window.addEventListener(
+        'mouseup',
+        stopDrawing
+    );
+
+
+    console.log(
+        'Multiplayer Drawing Artboard ready.'
+    );
+
+})();
+</script>
